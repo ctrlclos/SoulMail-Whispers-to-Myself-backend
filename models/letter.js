@@ -66,5 +66,5 @@ reflection: [reflectionSchema]
   timestamps: true 
 });
 
-const Letter = mongoose.model('Letter', hootSchema);
+const Letter = mongoose.model('Letter', letterSchema);
 module.exports = Letter;
