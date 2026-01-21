@@ -29,5 +29,3 @@ app.use("/context", contextRouter);
 app.listen(3000, () => {
   console.log('The express app is ready!');
 });
-
-console.log('test');
