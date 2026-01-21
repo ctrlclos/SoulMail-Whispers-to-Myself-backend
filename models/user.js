@@ -8,6 +8,14 @@ const userSchema = new mongoose.Schema({
     hashedPassword: {
         type: String,
         required: true
+     },
+     name: {
+      type: String,
+      default: ''
+     },
+     email: {
+      type: String,
+      default: ''
      }
     }, {
     timestamp: true

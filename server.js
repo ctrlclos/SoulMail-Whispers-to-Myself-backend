@@ -8,7 +8,7 @@ const logger = require('morgan');
 
 const authRouter = require('./controllers/auth');
 const usersRouter = require('./controllers/users');
-const hootsRouter = require("./controllers/hoots.js");
+const contextRouter = require("./controllers/context");
 
 mongoose.connect(process.env.MONGODB_URI);
 
@@ -22,8 +22,8 @@ app.use(logger('dev'));
 
 // Routes go here
 app.use('/auth', authRouter);
-app.use('users', usersRouter);
-app.use("/hoots", hootsRouter);
+app.use('/users', usersRouter);
+app.use("/context", contextRouter);
 
 
 app.listen(3000, () => {
