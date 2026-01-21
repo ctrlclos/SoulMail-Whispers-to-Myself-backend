@@ -1,6 +1,6 @@
 const express = require("express");
 const verifyToken = require("../middleware/verify-token.js");
-const letter = require("../models/letter.js");
+const Letter = require("../models/letter.js");
 const router = express.Router();
 
 // add routes here
@@ -57,7 +57,7 @@ router.put('/:id', verifyToken, async (req,res) => {
     if (!letter.user.equals(req.user._id)) {
       return res.status(403).json ({ err: 'Unauthorized' });
     }
-     const updatedLetter = await Letter.findByIdandUpdate(req.params.id,
+     const updatedLetter = await Letter.findByIdAndUpdate(req.params.id,
       {deliverAt: req.body.deliverAt },
       { new: true }
      ).populate('user');
@@ -81,7 +81,7 @@ router.delete('/:id', verifyToken, async (req,res) => {
       return res.status(403).json ({ err: 'Unauthorized' });
     }
 
-    await Letter.findByIdandDelete(req.params.id);
+    await Letter.findByIdAndDelete(req.params.id);
     res.json({ message: 'letter deleted' });
   } catch (err) {
     res.status(500).json ({ err: err.message})
