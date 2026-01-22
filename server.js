@@ -1,11 +1,15 @@
 const dotenv = require('dotenv');
 dotenv.config();
+
 const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
 const cors = require('cors');
 const logger = require('morgan');
 
+const authRouter = require('./routes/auth');
+const usersRouter = require('./routes/users');
+const lettersRouter = require('./routes/letters');
 const authRouter = require('./controllers/auth');
 const usersRouter = require('./controllers/users');
 
@@ -22,6 +26,7 @@ app.use(logger('dev'));
 // Routes go here
 app.use('/auth', authRouter);
 app.use('/users', usersRouter);
+app.use('/letters', lettersRouter);
 
 
 app.listen(3000, () => {
