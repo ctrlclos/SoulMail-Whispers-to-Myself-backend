@@ -1,7 +1,14 @@
-/** letter service
+/**
+ * Letter Service
+ *
+ * This service handles the complete lifecycle of a letter:
+ * 1. A user writes a letter and chooses when to receive it
+ * 2. The letter waits until the delivery date arrives
+ * 3. Once delivered, the user can reflect on their past words
  */
 
 const Letter = require('../models/letter');
+const { calculateFutureDate, DELIVERY_INTERVALS } = require('../utils/dateCalculator');
 
 /**
  * GET ALL LETTERS FOR A USER
