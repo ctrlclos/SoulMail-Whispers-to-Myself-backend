@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema({
      }
     }, {
     timestamp: true
-    
+  
 });
 
 userSchema.set('toJSON', {
