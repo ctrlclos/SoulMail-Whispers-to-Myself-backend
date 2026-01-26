@@ -10,6 +10,11 @@
 const Letter = require('../models/letter');
 const userService = require('./userService');
 const { DELIVERY_INTERVALS } = require('../utils/dateCalculator');
+const {
+  NotFoundError,
+  ForbiddenError,
+  ValidationError
+} = require('../middleware/errorHandler');
 
 
 /**
@@ -241,7 +246,7 @@ const findLetterOrFail = async (letterId) => {
   const letter = await Letter.findById(letterId).populate('user');
 
   if (!letter) {
-    throw new Error('Letter not found');
+    throw new NotFoundError('Letter not found');
   }
 
   return letter;
@@ -307,7 +312,7 @@ const verifyUserOwnsLetter = (letter, userId) => {
   const letterOwnerId = letter.user._id || letter.user;
 
   if (!letterOwnerId.equals(userId)) {
-    throw new Error('Unauthorized');
+    throw new ForbiddenError('You do not have permission to access this letter');
   }
 };
 
@@ -334,7 +339,7 @@ const updateDeliveryStatusIfDue = async (letter) => {
  */
 const ensureLetterIsNotDelivered = (letter) => {
   if (letter.isDelivered) {
-    throw new Error('Cannot edit a delivered letter');
+    throw new ForbiddenError('Cannot edit a delivered letter');
   }
 };
 
@@ -344,7 +349,7 @@ const ensureLetterIsNotDelivered = (letter) => {
  */
 const ensureLetterIsDelivered = (letter) => {
   if (!letter.isDelivered) {
-    throw new Error('Can only add reflections to delivered letters');
+    throw new ValidationError('Can only add reflections to delivered letters');
   }
 };
 
