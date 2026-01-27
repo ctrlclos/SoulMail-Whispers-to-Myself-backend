@@ -270,11 +270,34 @@ const removeLetterFromDatabase = async (letterId) => {
  * Update the delivery date of a letter
  */
 const updateDeliveryDate = async (letterId, newDate) => {
-  return await Letter.findByIdAndUpdate(
-    letterId,
-    { deliveredAt:new Date(newDate) },
-    { new: true, runValidators: true }
-  ).populate('user');
+  console.log('---UPDATE DELIVERY DATE DEBUG ---');
+  console.log(' newDate received:', newDate);
+  console.log('newDate as Date Object', new Date(newDate));
+  const letter = await Letter.findById(letterId);
+
+  if (!letter) {
+    throw new NotFoundError('Letter not found');
+  }
+  console.log('Current deliveredAt:', letter.deliveredAt);
+
+  letter.deliveredAt = new Date(newDate);
+
+// console.log('New deliveredAt:', letter.deliveredAt);
+// const tomorrow = newDate;
+// tomorrow.setHours(tomorrow.getHours + 24);
+// console.log('Tomorrow(24h from now):', tomorrow);
+// console.log('Is new date >= tomorrow', letter.deliveredAt >= tomorrow);
+
+try {
+  await letter.save();
+  console.log('Save successful!');
+} catch (error) {
+  console.log('Save failed', error.message);
+  throw error;
+}
+
+  await letter.populate('user');
+  return letter;
 };
 
 // --- Data Preparation Helpers ---
