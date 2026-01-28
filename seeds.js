@@ -34,19 +34,139 @@ const sampleUsers = [
     username: 'alice',
     password: 'Alice123',
     name: 'Alice Johnson',
-    email: 'alice@example.com'
+    email: 'alice@example.com',
+    birthday: new Date('1995-06-15'), // Summer birthday
+    settings: {
+      celebrationsEnabled: true,
+      birthdayOomph: true,
+      milestoneOomph: false, // Mixed settings
+      anniversaryOomph: true,
+      letterDeliveryOomph: true,
+      goalAccomplishedOomph: true,
+      streakOomph: false
+    },
+    stats: {
+      totalLetters: 8,
+      totalReflections: 5,
+      currentStreak: 4,
+      longestStreak: 12,
+      goalsAccomplished: 3
+    }
   },
   {
     username: 'bob',
     password: 'Bob456',
     name: 'Bob Smith',
-    email: 'bob@example.com'
+    email: 'bob@example.com',
+    birthday: null, // No birthday set
+    settings: {
+      celebrationsEnabled: true,
+      birthdayOomph: true,
+      milestoneOomph: true,
+      anniversaryOomph: true,
+      letterDeliveryOomph: true,
+      goalAccomplishedOomph: true,
+      streakOomph: true
+    },
+    stats: {
+      totalLetters: 2,
+      totalReflections: 0,
+      currentStreak: 1,
+      longestStreak: 1,
+      goalsAccomplished: 0
+    }
   },
   {
     username: 'charlie',
     password: 'Charlie789i',
     name: 'Charlie Brown',
-    email: 'charlie@example.com'
+    email: 'charlie@example.com',
+    birthday: new Date('1988-11-20'), // Fall birthday
+    settings: {
+      celebrationsEnabled: true,
+      birthdayOomph: true,
+      milestoneOomph: true,
+      anniversaryOomph: true,
+      letterDeliveryOomph: true,
+      goalAccomplishedOomph: true,
+      streakOomph: true
+    },
+    stats: {
+      totalLetters: 25,
+      totalReflections: 18,
+      currentStreak: 2,
+      longestStreak: 15,
+      goalsAccomplished: 8
+    }
+  },
+  {
+    username: 'diana',
+    password: 'Diana123',
+    name: 'Diana Prince',
+    email: 'diana@example.com',
+    birthday: new Date('1990-03-22'), // Spring birthday
+    settings: {
+      celebrationsEnabled: true,
+      birthdayOomph: true,
+      milestoneOomph: true,
+      anniversaryOomph: true,
+      letterDeliveryOomph: true,
+      goalAccomplishedOomph: true,
+      streakOomph: true
+    },
+    stats: {
+      totalLetters: 50,
+      totalReflections: 45,
+      currentStreak: 21,
+      longestStreak: 30,
+      goalsAccomplished: 12
+    }
+  },
+  {
+    username: 'eve',
+    password: 'Eve2024',
+    name: 'Eve Martinez',
+    email: 'eve@example.com',
+    birthday: new Date('1992-09-08'),
+    settings: {
+      celebrationsEnabled: false, // All celebrations disabled
+      birthdayOomph: false,
+      milestoneOomph: false,
+      anniversaryOomph: false,
+      letterDeliveryOomph: false,
+      goalAccomplishedOomph: false,
+      streakOomph: false
+    },
+    stats: {
+      totalLetters: 6,
+      totalReflections: 3,
+      currentStreak: 0,
+      longestStreak: 5,
+      goalsAccomplished: 2
+    }
+  },
+  {
+    username: 'frank',
+    password: 'Frank456',
+    name: 'Frank Chen',
+    email: 'frank@example.com',
+    birthday: new Date('1993-02-10'), // Upcoming birthday (Feb)
+    settings: {
+      celebrationsEnabled: true,
+      birthdayOomph: true,
+      milestoneOomph: true,
+      anniversaryOomph: false,
+      letterDeliveryOomph: true,
+      goalAccomplishedOomph: false,
+      streakOomph: true
+    },
+    stats: {
+      totalLetters: 12,
+      totalReflections: 7,
+      currentStreak: 5,
+      longestStreak: 8,
+      goalsAccomplished: 4
+    }
   }
 ];
 
@@ -72,7 +192,10 @@ const seedDatabase = async () => {
         username: user.username,
         hashedPassword,
         name: user.name,
-        email: user.email
+        email: user.email,
+        birthday: user.birthday,
+        settings: user.settings,
+        stats: user.stats
       });
       createdUsers.push(newUser);
       console.log(`  ✅ Created user: ${user.username}`);
@@ -81,68 +204,134 @@ const seedDatabase = async () => {
     // Create sample letters
     console.log('💌 Creating sample letters...');
 
-    // Alice's letters
+    // Helper: Get users by index
     const alice = createdUsers[0];
-    const pastDate = new Date();
-    pastDate.setDate(pastDate.getDate() - 30); // 30 days ago
+    const bob = createdUsers[1];
+    const charlie = createdUsers[2];
+    const diana = createdUsers[3];
+    const eve = createdUsers[4];
+    const frank = createdUsers[5];
 
-    const futureDate = new Date();
-    futureDate.setDate(futureDate.getDate() + 30); // 30 days from now
+    // Date helpers
+    const pastWeek = new Date();
+    pastWeek.setDate(pastWeek.getDate() - 7);
 
-    // Use createLetterForSeed for already-delivered letters (past dates)
-    const letter1 = await createLetterForSeed({
+    const pastMonth = new Date();
+    pastMonth.setDate(pastMonth.getDate() - 30);
+
+    const past6Months = new Date();
+    past6Months.setMonth(past6Months.getMonth() - 6);
+
+    const pastYear = new Date();
+    pastYear.setFullYear(pastYear.getFullYear() - 1);
+
+    const futureWeek = new Date();
+    futureWeek.setDate(futureWeek.getDate() + 7);
+
+    const futureMonth = new Date();
+    futureMonth.setDate(futureMonth.getDate() + 30);
+
+    const future6Months = new Date();
+    future6Months.setMonth(future6Months.getMonth() + 6);
+
+    const futureYear = new Date();
+    futureYear.setFullYear(futureYear.getFullYear() + 1);
+
+    const customDate = new Date('2026-12-25'); // Christmas 2026
+
+    // alice's letters (mood: 🤩, 🙏, 😰)
+
+    // Letter 1: Alice - Delivered, 1month interval, mood 🤩
+    const aliceLetter1 = await createLetterForSeed({
       user: alice._id,
       title: 'My 30-Day Journey',
-      content: 'Dear Alice, I hope you are doing well! This past month has been transformative. Remember to stay focused on your goals and be kind to yourself.',
+      content: 'Dear Alice, I hope you are doing well! This past month has been transformative. Remember to stay focused on your goals and be kind to yourself. I have been feeling a bit stressed about work, but the exercise is helping me manage it.',
       mood: '🤩',
       weather: 'Sunny',
       temperature: 72,
       currentSong: 'Good as Hell - Lizzo',
       topHeadLine: 'New Year, New Goals',
       location: 'Home Office',
-      goal1: 'Exercise 3 times a week',
-      goal2: 'Read 2 books',
-      goal3: 'Learn Express.js',
       deliveryInterval: '1month',
-      deliveredAt: pastDate,
+      deliveredAt: pastMonth,
       isDelivered: true,
+      goals: [
+        {
+          text: 'Exercise 3 times a week',
+          status: 'completed',
+          reflection: 'I actually managed to go 4 times a week! Dedicated morning runs really helped.'
+        },
+        {
+          text: 'Read 2 books',
+          status: 'completed',
+          reflection: 'Read "Atomic Habits" and "Deep Work".'
+        },
+        {
+          text: 'Learn Express.js',
+          status: 'inProgress',
+          reflection: 'Still working on the middleware concepts, but making good progress.'
+        }
+      ],
       reflections: [
         {
-          reflection: 'Reading this back, I am amazed at how much I have accomplished. I stayed consistent with exercise and actually read 3 books instead of 2! The Express.js learning is going great. Very proud of myself!'
+          reflection: 'Reading this back, I am amazed at how much I have accomplished. I stayed consistent with exercise and actually read 3 books instead of 2! The Express.js learning is going great. Very proud of myself! I definitely feel less stressed now than when I wrote this.'
         },
         {
           reflection: 'One thing I wish I did better was getting more sleep. Need to work on that next month.'
         }
       ]
     });
-    console.log('  ✅ Created delivered letter with reflections for Alice');
+    console.log('  ✅ Created letter: Alice - 1month delivered (🤩)');
 
-    const letter2 = await Letter.create({
+    // Letter 2: Alice - Future, 1month interval, mood 🙏
+    const aliceLetter2 = await Letter.create({
       user: alice._id,
       title: 'My Next 30 Days - New Goals',
-      content: 'Dear Future Alice, Here are my goals for the next month: Complete my Node.js backend project, maintain exercise routine, and start meditation.',
+      content: 'Dear Future Alice, Here are my goals for the next month: Complete my Node.js backend project, maintain exercise routine, and start meditation. I want to feel more centered and less reactive.',
       mood: '🙏',
       weather: 'Cloudy',
       temperature: 68,
       currentSong: 'Don\'t Give Up - Peter Gabriel',
       topHeadLine: 'Tech Industry Booming',
       location: 'Workspace',
-      goal1: 'Complete backend project',
-      goal2: 'Meditate daily',
-      goal3: 'Network with 5 developers',
       deliveryInterval: '1month',
-      deliveredAt: futureDate,
+      deliveredAt: futureMonth,
       isDelivered: false,
+      goals: [
+        { text: 'Complete backend project', status: 'pending' },
+        { text: 'Meditate daily', status: 'pending' },
+        { text: 'Network with 5 developers', status: 'pending' }
+      ],
       reflections: []
     });
-    console.log('  ✅ Created undelivered letter for Alice');
+    console.log('  ✅ Created letter: Alice - 1month future (🙏)');
 
-    // Bob's letters
-    const bob = createdUsers[1];
-    const oneWeekFuture = new Date();
-    oneWeekFuture.setDate(oneWeekFuture.getDate() + 7);
+    // Letter 3: Alice - Future, 1week interval, mood 😰
+    const aliceLetter3 = await Letter.create({
+      user: alice._id,
+      title: 'Dealing with Anxiety',
+      content: 'I have been feeling anxious about the upcoming presentation. I need to remember to breathe and trust in my preparation. Future me, I hope you handled this with grace.',
+      mood: '😰',
+      weather: 'Stormy',
+      temperature: 60,
+      currentSong: 'Breathe Me - Sia',
+      topHeadLine: 'Mental Health Awareness Week',
+      location: 'Bedroom',
+      deliveryInterval: '1week',
+      deliveredAt: futureWeek,
+      isDelivered: false,
+      goals: [
+        { text: 'Practice breathing exercises', status: 'pending' },
+        { text: 'Rehearse presentation 3 times', status: 'pending' }
+      ],
+      reflections: []
+    });
+    console.log('  ✅ Created letter: Alice - 1week future (😰)');
 
-    const letter3 = await Letter.create({
+    // bob's letters (mood: 😢, empty)
+
+    // Letter 4: Bob - Future, 1week interval, mood 😢
+    const bobLetter1 = await Letter.create({
       user: bob._id,
       title: 'Weekend Reflection',
       content: 'Had an amazing weekend. Hiked a new trail, cooked a great meal, and spent time with loved ones. Feeling grateful for life\'s simple pleasures.',
@@ -152,75 +341,326 @@ const seedDatabase = async () => {
       currentSong: 'Sanctuary - Joji',
       topHeadLine: 'Economy Improving',
       location: 'Mountain Trail',
-      goal1: 'Stay healthy',
-      goal2: 'Spend quality time with family',
-      goal3: 'Explore new places',
       deliveryInterval: '1week',
-      deliveredAt: oneWeekFuture,
+      deliveredAt: futureWeek,
       isDelivered: false,
+      goals: [
+        { text: 'Stay healthy', status: 'pending' },
+        { text: 'Spend quality time with family', status: 'pending' },
+        { text: 'Explore new places', status: 'pending' }
+      ],
       reflections: []
     });
-    console.log('  ✅ Created upcoming letter for Bob');
+    console.log('  ✅ Created letter: Bob - 1week future (😢)');
 
-    // Charlie's letters
-    const charlie = createdUsers[2];
-    const sixMonthsFuture = new Date();
-    sixMonthsFuture.setMonth(sixMonthsFuture.getMonth() + 6);
+    // Letter 5: Bob - Delivered, customDate interval, no mood
+    const bobLetter2 = await createLetterForSeed({
+      user: bob._id,
+      title: 'First Letter Ever',
+      content: 'This is my first time writing to my future self. I am not sure what to expect, but I am excited to see where I will be in a few weeks.',
+      mood: '',
+      weather: 'Partly Cloudy',
+      temperature: 65,
+      currentSong: 'Here Comes the Sun - The Beatles',
+      topHeadLine: 'Spring Has Arrived',
+      location: 'Park Bench',
+      deliveryInterval: 'custom',
+      deliveredAt: pastWeek,
+      isDelivered: true,
+      goals: [
+        { text: 'Write more letters', status: 'completed', reflection: 'I did it!' }
+      ],
+      reflections: [
+        {
+          reflection: 'Wow, reading this brings back memories. I am glad I started this journey.'
+        }
+      ]
+    });
+    console.log('  ✅ Created letter: Bob - customDate delivered (no mood)');
 
-    const letter4 = await Letter.create({
+    // charlie's letters (mood: ☺️, 🤩, 😫)
+
+    // Letter 6: Charlie - Future, 6months interval, mood 🤩
+    const charlieLetter1 = await Letter.create({
       user: charlie._id,
       title: 'Long-Term Vision',
-      content: 'Six months from now, I hope to see significant progress in my career. I want to be promoted to senior developer and have led at least two major projects.',
+      content: 'Six months from now, I hope to see significant progress in my career. I want to be promoted to senior developer and have led at least two major projects. I am excited about the possibilities!',
       mood: '🤩',
       weather: 'Sunny',
       temperature: 75,
       currentSong: 'Walking on Sunshine - Katrina & The Waves',
       topHeadLine: 'AI Revolution Continues',
       location: 'Office',
-      goal1: 'Get promoted to senior',
-      goal2: 'Lead a major project',
-      goal3: 'Mentor junior developers',
       deliveryInterval: '6months',
-      deliveredAt: sixMonthsFuture,
+      deliveredAt: future6Months,
       isDelivered: false,
+      goals: [
+        { text: 'Get promoted to senior', status: 'pending' },
+        { text: 'Lead a major project', status: 'pending' },
+        { text: 'Mentor junior developers', status: 'pending' }
+      ],
       reflections: []
     });
-    console.log('  ✅ Created 6-month future letter for Charlie');
+    console.log('  ✅ Created letter: Charlie - 6months future (🤩)');
 
-    // Use createLetterForSeed for already-delivered letters (past dates)
-    const letter5 = await createLetterForSeed({
+    // Letter 7: Charlie - Delivered, 1year interval, mood ☺️
+    const charlieLetter2 = await createLetterForSeed({
       user: charlie._id,
       title: 'A Year of Growth',
-      content: 'Looking back on the past year - what an incredible journey! I\'ve learned so much, grown as a person and professional.',
+      content: 'Looking back on the past year - what an incredible journey! I\'ve learned so much, grown as a person and professional. It has been tough at times, but worth it.',
       mood: '☺️',
       weather: 'Clear',
       temperature: 70,
       currentSong: 'All the Stars - Kendrick Lamar',
       topHeadLine: 'Education Innovation Awards',
       location: 'Tech Conference',
-      goal1: 'Continuous learning',
-      goal2: 'Build meaningful relationships',
-      goal3: 'Contribute to open source',
       deliveryInterval: '1year',
-      deliveredAt: new Date(new Date().setFullYear(new Date().getFullYear() - 1)), // 1 year ago
+      deliveredAt: pastYear,
       isDelivered: true,
+      goals: [
+        { text: 'Continuous learning', status: 'completed', reflection: 'Took 3 courses this year.' },
+        { text: 'Build meaningful relationships', status: 'completed', reflection: 'Made 2 new close friends.' },
+        { text: 'Contribute to open source', status: 'abandoned', reflection: 'Did not have time.' }
+      ],
       reflections: [
         {
-          reflection: 'Amazing! I actually accomplished all my goals and more. This practice of writing letters to myself is incredibly powerful.'
+          reflection: 'Amazing! I actually accomplished most of my goals. This practice of writing letters to myself is incredibly powerful.'
         }
       ]
     });
-    console.log('  ✅ Created past year letter for Charlie with reflection');
+    console.log('  ✅ Created letter: Charlie - 1year delivered (☺️)');
 
-    // Summary
+    // Letter 8: Charlie - Delivered, 6months interval, mood 😫 (for carry forward demo)
+    const charlieLetter3 = await createLetterForSeed({
+      user: charlie._id,
+      title: 'Burnout Recovery',
+      content: 'I have been working too hard and feeling burned out. I need to remember to take breaks and prioritize my health over work.',
+      mood: '😫',
+      weather: 'Overcast',
+      temperature: 62,
+      currentSong: 'Tired - Beabadoobee',
+      topHeadLine: 'Workplace Wellness Initiatives',
+      location: 'Home',
+      deliveryInterval: '6months',
+      deliveredAt: past6Months,
+      isDelivered: true,
+      goals: [
+        { text: 'Take a vacation', status: 'completed', reflection: 'Went to Hawaii for 2 weeks!' },
+        { text: 'Set work boundaries', status: 'inProgress', reflection: 'Getting better at saying no.' },
+        { text: 'Start therapy', status: 'carriedForward', carriedForwardTo: charlieLetter1._id }
+      ],
+      reflections: [
+        {
+          reflection: 'I am so glad I took that vacation. I feel recharged and ready to tackle new challenges.'
+        }
+      ]
+    });
+    // Update the carried forward goal in charlieLetter1
+    charlieLetter1.goals.push({
+      text: 'Start therapy',
+      status: 'pending',
+      carriedForwardFrom: charlieLetter3._id
+    });
+    await charlieLetter1.save();
+    console.log('  ✅ Created letter: Charlie - 6months delivered (😫) with carried goal');
+
+    // diana's letters (power user)
+
+    // Letter 9: Diana - Delivered, 1week interval, mood 🙏
+    const dianaLetter1 = await createLetterForSeed({
+      user: diana._id,
+      title: 'Weekly Retrospective',
+      content: 'Another busy week. I am feeling grateful for my supportive team at work. The project launch was successful, and we celebrated with a team dinner. I want to remember this feeling of accomplishment.',
+      mood: '🙏',
+      weather: 'Windy',
+      temperature: 65,
+      currentSong: 'Celebration - Kool & The Gang',
+      topHeadLine: 'Local Team Wins Championship',
+      location: 'Downtown Cafe',
+      deliveryInterval: '1week',
+      deliveredAt: pastWeek,
+      isDelivered: true,
+      goals: [
+        {
+          text: 'Launch Project X',
+          status: 'completed',
+          reflection: 'Launch went smoother than expected. No critical bugs!'
+        },
+        {
+          text: 'Mentor junior dev',
+          status: 'inProgress',
+          reflection: 'Had two sessions this week. They are improving fast.'
+        }
+      ],
+      reflections: [
+        {
+          reflection: 'This was a great week. I am proud of the team and myself.'
+        }
+      ]
+    });
+    console.log('  ✅ Created letter: Diana - 1week delivered (🙏)');
+
+    // Letter 10: Diana - Future, 1year interval, mood 🤩
+    const dianaLetter2 = await Letter.create({
+      user: diana._id,
+      title: 'One Year Vision',
+      content: 'In one year, I want to have launched my own startup. I am excited about the journey ahead and all the learning that will come with it.',
+      mood: '🤩',
+      weather: 'Sunny',
+      temperature: 78,
+      currentSong: 'Eye of the Tiger - Survivor',
+      topHeadLine: 'Startup Funding Hits Record High',
+      location: 'Co-working Space',
+      deliveryInterval: '1year',
+      deliveredAt: futureYear,
+      isDelivered: false,
+      goals: [
+        { text: 'Build MVP', status: 'pending' },
+        { text: 'Raise seed funding', status: 'pending' },
+        { text: 'Hire first employee', status: 'pending' }
+      ],
+      reflections: []
+    });
+    console.log('  ✅ Created letter: Diana - 1year future (🤩)');
+
+    // eve's letters (celebrations disabled)
+
+    // Letter 11: Eve - Delivered, 1month interval, mood ☺️
+    const eveLetter1 = await createLetterForSeed({
+      user: eve._id,
+      title: 'Simple Joys',
+      content: 'I have been focusing on the simple things in life. A good cup of coffee, a walk in nature, and time with friends. These are what matter most.',
+      mood: '☺️',
+      weather: 'Sunny',
+      temperature: 70,
+      currentSong: 'Three Little Birds - Bob Marley',
+      topHeadLine: 'Happiness Study Released',
+      location: 'Coffee Shop',
+      deliveryInterval: '1month',
+      deliveredAt: pastMonth,
+      isDelivered: true,
+      goals: [
+        { text: 'Practice gratitude daily', status: 'completed', reflection: 'Kept a gratitude journal.' },
+        { text: 'Disconnect from social media', status: 'completed', reflection: 'Deleted apps for a month.' }
+      ],
+      reflections: [
+        {
+          reflection: 'This month was peaceful. I feel more present and content.'
+        }
+      ]
+    });
+    console.log('  ✅ Created letter: Eve - 1month delivered (☺️)');
+
+    // Letter 12: Eve - Future, customDate interval, mood 😰
+    const eveLetter2 = await Letter.create({
+      user: eve._id,
+      title: 'Holiday Anxiety',
+      content: 'The holidays are coming up and I am feeling anxious about family gatherings. I need to set boundaries and take care of myself.',
+      mood: '😰',
+      weather: 'Cold',
+      temperature: 45,
+      currentSong: 'Let It Be - The Beatles',
+      topHeadLine: 'Holiday Shopping Season Begins',
+      location: 'Home',
+      deliveryInterval: 'custom',
+      deliveredAt: customDate,
+      isDelivered: false,
+      goals: [
+        { text: 'Set clear boundaries', status: 'pending' },
+        { text: 'Plan self-care activities', status: 'pending' }
+      ],
+      reflections: []
+    });
+    console.log('  ✅ Created letter: Eve - customDate future (😰)');
+
+    // frank's letters (upcoming birthday)
+
+    // Letter 13: Frank - Delivered, 1month interval, mood 😫
+    const frankLetter1 = await createLetterForSeed({
+      user: frank._id,
+      title: 'Feeling Overwhelmed',
+      content: 'Work has been overwhelming lately. Too many deadlines, too little time. I need to learn to delegate and ask for help.',
+      mood: '😫',
+      weather: 'Rainy',
+      temperature: 58,
+      currentSong: 'Stressed Out - Twenty One Pilots',
+      topHeadLine: 'Workplace Stress on the Rise',
+      location: 'Office',
+      deliveryInterval: '1month',
+      deliveredAt: pastMonth,
+      isDelivered: true,
+      goals: [
+        { text: 'Delegate 2 tasks', status: 'completed', reflection: 'Delegated successfully!' },
+        { text: 'Ask manager for support', status: 'completed', reflection: 'Had a great conversation.' },
+        { text: 'Take a mental health day', status: 'abandoned', reflection: 'Too busy to take time off.' }
+      ],
+      reflections: [
+        {
+          reflection: 'I am glad I reached out for help. Things are more manageable now.'
+        }
+      ]
+    });
+    console.log('  ✅ Created letter: Frank - 1month delivered (😫)');
+
+    // Letter 14: Frank - Future, 6months interval, mood 🙏
+    const frankLetter2 = await Letter.create({
+      user: frank._id,
+      title: 'Career Pivot',
+      content: 'I am considering a career change. I want to move into product management. This is scary but exciting.',
+      mood: '🙏',
+      weather: 'Clear',
+      temperature: 72,
+      currentSong: 'Changes - David Bowie',
+      topHeadLine: 'Career Transitions Becoming More Common',
+      location: 'Library',
+      deliveryInterval: '6months',
+      deliveredAt: future6Months,
+      isDelivered: false,
+      goals: [
+        { text: 'Complete PM certification', status: 'pending' },
+        { text: 'Network with PMs', status: 'pending' },
+        { text: 'Apply to 5 PM roles', status: 'pending' }
+      ],
+      reflections: []
+    });
+    console.log('  ✅ Created letter: Frank - 6months future (🙏)');
+
+    // Letter 15: Frank - Future, 1week interval, mood 😢
+    const frankLetter3 = await Letter.create({
+      user: frank._id,
+      title: 'Missing Home',
+      content: 'I have been feeling homesick lately. I miss my family and friends back home. I need to plan a visit soon.',
+      mood: '😢',
+      weather: 'Foggy',
+      temperature: 55,
+      currentSong: 'Homeward Bound - Simon & Garfunkel',
+      topHeadLine: 'Travel Restrictions Eased',
+      location: 'Apartment',
+      deliveryInterval: '1week',
+      deliveredAt: futureWeek,
+      isDelivered: false,
+      goals: [
+        { text: 'Book flight home', status: 'pending' },
+        { text: 'Video call family weekly', status: 'pending' }
+      ],
+      reflections: []
+    });
+    console.log('  ✅ Created letter: Frank - 1week future (😢)');
+
     console.log('\n' + '='.repeat(50));
     console.log('✅ DATABASE SEEDED SUCCESSFULLY!');
     console.log('='.repeat(50));
     console.log('\n📊 Summary:');
     console.log(`  • Users created: ${createdUsers.length}`);
-    console.log(`  • Letters created: 5`);
-    console.log(`  • Delivered letters: 2`);
-    console.log(`  • Pending letters: 3`);
+    console.log(`  • Letters created: 15`);
+    console.log(`  • Delivered letters: 7`);
+    console.log(`  • Pending letters: 8`);
+    console.log('\n🎨 Feature Coverage:');
+    console.log('  • All moods: ☺️, 😢, 😰, 🤩, 🙏, 😫, (empty)');
+    console.log('  • All intervals: 1week, 1month, 6months, 1year, custom');
+    console.log('  • All goal statuses: pending, completed, inProgress, abandoned, carriedForward');
+    console.log('  • User settings: varied celebration toggles');
+    console.log('  • Birthdays: 5 users with birthdays set');
     console.log('\n🔑 Test Credentials:');
     sampleUsers.forEach(user => {
       console.log(`  • ${user.username} / ${user.password}`);
@@ -228,7 +668,6 @@ const seedDatabase = async () => {
     console.log('\n💡 Next steps:');
     console.log('  1. Start the server: npm run dev');
     console.log('  2. Sign in with any test credential above');
-    console.log('  3. Check the docs: POSTMAN_TESTING.md or REACT_ENDPOINTS.md');
     console.log('\n');
 
     await mongoose.connection.close();

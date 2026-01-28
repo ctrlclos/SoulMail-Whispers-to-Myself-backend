@@ -10,6 +10,7 @@ const logger = require('morgan');
 const authRouter = require('./routes/auth');
 const usersRouter = require('./routes/users')
 const lettersRouter = require('./routes/letters');
+const aiRoutes = require('./routes/ai');
 const { errorHandler } = require('./middleware/errorHandler');
 
 
@@ -19,7 +20,13 @@ mongoose.connection.on('connected', () => {
   console.log(`Connected to MongoDB ${mongoose.connection.name}.`);
 });
 
-app.use(cors());
+// CORS configuration
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
 app.use(express.json());
 app.use(logger('dev'));
 
@@ -27,6 +34,7 @@ app.use(logger('dev'));
 app.use('/auth', authRouter);
 app.use('/users', usersRouter);
 app.use('/letters', lettersRouter);
+app.use('/ai', aiRoutes);
 
 // 404 handler for undefined routes
 app.use((req, res, next) => {
@@ -41,7 +49,8 @@ app.use((req, res, next) => {
 
 // Global error handler (must be last)
 app.use(errorHandler);
+const PORT = process.env.PORT || 3000;
 
-app.listen(3000, () => {
-  console.log('The express app is ready!');
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}. The express app is ready!`);
 });
