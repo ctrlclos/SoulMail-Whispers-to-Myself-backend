@@ -56,6 +56,20 @@ class UnauthorizedError extends AppError {
     this.code = 'UNAUTHORIZED';
   }
 }
+
+class AIServiceError extends AppError {
+  constructor(message = 'AI service encountered an error', originalError = null) {
+    super(message, 503);
+    this.code = 'AI_SERVICE_ERROR';
+    this.originalError = originalError;
+
+      // Capture provider-specific error details
+    if (originalError) {
+      this.providerStatus = originalError.status;
+      this.providerMessage = originalError.message;
+    }
+  }
+}
 /**
  * Extract user-friendly messages from Mongoose ValidationError
  *
@@ -204,6 +218,7 @@ module.exports = {
   NotFoundError,
   ForbiddenError,
   UnauthorizedError,
+  AIServiceError,
 
   // Middleware
   errorHandler,
